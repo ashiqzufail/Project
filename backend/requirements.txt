@@ -1,0 +1,10 @@
+Flask
+Flask-Cors
+Flask-JWT-Extended
+Flask-SQLAlchemy
+python-dotenv
+
+chromadb
+sentence-transformers
+Pillow
+numpy
