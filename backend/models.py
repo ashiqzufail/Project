@@ -7,6 +7,7 @@ class User(db.Model):
     username = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
+    role = db.Column(db.String(20), default='user') # 'user' or 'admin'
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
 
@@ -14,7 +15,8 @@ class User(db.Model):
         return {
             "id": self.id,
             "username": self.username,
-            "email": self.email
+            "email": self.email,
+            "role": self.role
         }
 
 class LostItem(db.Model):
@@ -94,14 +96,20 @@ class FoundItem(db.Model):
 
 class CCTVRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    location = db.Column(db.String(200), nullable=False)
-    date_request = db.Column(db.Date, nullable=False)
-    start_time = db.Column(db.Time, nullable=False)
+    location = db.Column(db.String(200), nullable=False) # Incident Location
+    date_request = db.Column(db.Date, nullable=False) # Incident Date
+    start_time = db.Column(db.Time, nullable=False) # Incident Time
     end_time = db.Column(db.Time, nullable=False)
-    status = db.Column(db.String(20), default='pending') # pending, approved, rejected
-    footage_url = db.Column(db.String(500))
+    description = db.Column(db.Text)
+    supporting_document = db.Column(db.String(500)) # Path to user-uploaded doc
+    admin_notes = db.Column(db.Text)
+    status = db.Column(db.String(20), default='pending') # pending, in_progress, resolved
+    footage_url = db.Column(db.String(500)) # Legacy/Single footage support
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref=db.backref('cctv_requests', lazy=True))
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+    
+    footages = db.relationship('CCTVFootage', backref='request', lazy=True, cascade="all, delete-orphan")
 
     def to_dict(self):
         return {
@@ -110,7 +118,27 @@ class CCTVRequest(db.Model):
             "date_request": str(self.date_request),
             "start_time": str(self.start_time),
             "end_time": str(self.end_time),
+            "description": self.description,
+            "supporting_document": self.supporting_document,
+            "admin_notes": self.admin_notes,
             "status": self.status,
             "footage_url": self.footage_url,
+            "footages": [f.to_dict() for f in self.footages],
+            "user_id": self.user_id,
+            "requester": self.user.username if self.user else "Unknown",
             "created_at": self.created_at
+        }
+
+class CCTVFootage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    request_id = db.Column(db.Integer, db.ForeignKey('cctv_request.id'), nullable=False)
+    file_path = db.Column(db.String(500), nullable=False)
+    uploaded_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "request_id": self.request_id,
+            "file_path": self.file_path,
+            "uploaded_at": self.uploaded_at
         }

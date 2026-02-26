@@ -18,7 +18,8 @@ def register():
     user = User(
         username=data.get('name', 'User'),
         email=data['email'],
-        password_hash=generate_password_hash(data['password'], method='pbkdf2:sha256')
+        password_hash=generate_password_hash(data['password'], method='pbkdf2:sha256'),
+        role=data.get('role', 'user')
     )
     db.session.add(user)
     db.session.commit()
@@ -28,7 +29,10 @@ def register():
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
+    data = request.get_json(silent=True)
+    if not data or not data.get('email') or not data.get('password'):
+        return jsonify({"msg": "Missing email or password"}), 400
+        
     user = User.query.filter_by(email=data.get('email')).first()
     
     if user and check_password_hash(user.password_hash, data.get('password')):

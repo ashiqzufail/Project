@@ -11,6 +11,7 @@ export default function Login() {
 
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [loginType, setLoginType] = useState('user'); // 'user' or 'admin'
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -19,9 +20,20 @@ export default function Login() {
 
         try {
             const data = await import('../lib/api').then(m => m.login(email, password));
+
+            // Validate role if logging in as admin
+            if (loginType === 'admin' && data.user.role !== 'admin') {
+                throw new Error('Access denied. No admin privileges.');
+            }
+
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
-            navigate('/home');
+
+            if (data.user.role === 'admin') {
+                navigate('/admin/dashboard');
+            } else {
+                navigate('/home');
+            }
         } catch (err) {
             setError(err.message);
         } finally {
@@ -46,9 +58,35 @@ export default function Login() {
                 <div className="glass-panel p-8 rounded-2xl">
                     <div className="text-center mb-8">
                         <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-                            Welcome Back
+                            {loginType === 'admin' ? 'Admin Portal' : 'Welcome Back'}
                         </h1>
-                        <p className="text-text-muted mt-2">Sign in to recover lost items</p>
+                        <p className="text-text-muted mt-2">
+                            {loginType === 'admin' ? 'Secure administrative access' : 'Sign in to recover lost items'}
+                        </p>
+                    </div>
+
+                    {/* Login Type Switcher */}
+                    <div className="flex p-1 bg-surface-dark border border-white/5 rounded-xl mb-6">
+                        <button
+                            type="button"
+                            onClick={() => setLoginType('user')}
+                            className={cn(
+                                "flex-1 py-2 text-sm font-medium rounded-lg transition-all",
+                                loginType === 'user' ? "bg-primary text-white shadow-lg" : "text-text-muted hover:text-text"
+                            )}
+                        >
+                            User Login
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setLoginType('admin')}
+                            className={cn(
+                                "flex-1 py-2 text-sm font-medium rounded-lg transition-all",
+                                loginType === 'admin' ? "bg-blue-600 text-white shadow-lg" : "text-text-muted hover:text-text"
+                            )}
+                        >
+                            Admin Login
+                        </button>
                     </div>
 
                     <form onSubmit={handleLogin} className="space-y-6">

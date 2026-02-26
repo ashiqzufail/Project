@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Camera, Calendar, Clock, MapPin } from 'lucide-react';
+import { X, Camera, Calendar, Clock, MapPin, FileUp, Info } from 'lucide-react';
 
 export default function CCTVRequestModal({ isOpen, onClose }) {
     const [loading, setLoading] = useState(false);
@@ -13,8 +13,10 @@ export default function CCTVRequestModal({ isOpen, onClose }) {
         location: '',
         date: '',
         startTime: '',
-        endTime: ''
+        endTime: '',
+        description: ''
     });
+    const [file, setFile] = useState(null);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -41,13 +43,22 @@ export default function CCTVRequestModal({ isOpen, onClose }) {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://127.0.0.1:5000/api/cctv/request', {
+            const dataToSubmit = new FormData();
+            dataToSubmit.append('location', formData.location);
+            dataToSubmit.append('date', formData.date);
+            dataToSubmit.append('startTime', formData.startTime);
+            dataToSubmit.append('endTime', formData.endTime);
+            dataToSubmit.append('description', formData.description);
+            if (file) {
+                dataToSubmit.append('supporting_document', file);
+            }
+
+            const response = await fetch('/api/cctv/request', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(formData)
+                body: dataToSubmit
             });
 
             if (!response.ok) {
@@ -63,15 +74,13 @@ export default function CCTVRequestModal({ isOpen, onClose }) {
             }
 
             setSuccess(true);
-            // Don't auto-close if there's a specific warning message, let user read it
-            if (data.hardware_found !== false) {
-                setTimeout(() => {
-                    setSuccess(false);
-                    setFormData({ location: '', date: '', startTime: '', endTime: '' });
-                    setSuccessMessage('');
-                    onClose();
-                }, 2000);
-            }
+            setTimeout(() => {
+                setSuccess(false);
+                setFormData({ location: '', date: '', startTime: '', endTime: '', description: '' });
+                setFile(null);
+                setSuccessMessage('');
+                onClose();
+            }, 3000);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -202,6 +211,47 @@ export default function CCTVRequestModal({ isOpen, onClose }) {
                                             />
                                         </div>
                                         {fieldErrors.endTime && <span className="text-xs text-red-400">Required</span>}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-white/80">Description</label>
+                                    <div className="relative">
+                                        <Info className="absolute left-3 top-3 w-4 h-4 text-white/40" />
+                                        <textarea
+                                            name="description"
+                                            value={formData.description}
+                                            onChange={handleChange}
+                                            placeholder="Briefly describe the incident..."
+                                            rows="3"
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg py-2.5 pl-10 pr-4 text-white placeholder:text-white/30 focus:outline-none focus:border-blue-500/50 transition-colors resize-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-white/80">Supporting Document (Optional)</label>
+                                    <div className="relative">
+                                        <input
+                                            type="file"
+                                            id="supporting_document"
+                                            onChange={(e) => setFile(e.target.files[0])}
+                                            className="hidden"
+                                        />
+                                        <label
+                                            htmlFor="supporting_document"
+                                            className="flex items-center gap-3 w-full bg-white/5 border border-dashed border-white/10 hover:border-blue-500/40 rounded-lg p-4 cursor-pointer transition-all"
+                                        >
+                                            <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
+                                                <FileUp size={18} />
+                                            </div>
+                                            <div className="truncate flex-1">
+                                                <p className="text-sm font-medium text-white">
+                                                    {file ? file.name : "Choose a file"}
+                                                </p>
+                                                <p className="text-xs text-white/40">PDF, JPG, PNG up to 10MB</p>
+                                            </div>
+                                        </label>
                                     </div>
                                 </div>
 

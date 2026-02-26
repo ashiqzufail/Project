@@ -11,6 +11,7 @@ export default function Register() {
 
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [role, setRole] = useState('user'); // 'user' or 'admin'
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -18,10 +19,15 @@ export default function Register() {
         setLoading(true);
 
         try {
-            const data = await import('../lib/api').then(m => m.register(name, email, password));
+            const data = await import('../lib/api').then(m => m.register(name, email, password, role));
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
-            navigate('/home');
+
+            if (data.user.role === 'admin') {
+                navigate('/admin/dashboard');
+            } else {
+                navigate('/home');
+            }
         } catch (err) {
             setError(err.message);
         } finally {
@@ -46,9 +52,31 @@ export default function Register() {
                 <div className="glass-panel p-8 rounded-2xl">
                     <div className="text-center mb-8">
                         <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-white to-text-muted">
-                            Create Account
+                            {role === 'admin' ? 'Admin Registration' : 'Create Account'}
                         </h1>
-                        <p className="text-text-muted mt-2">Join the intelligent Lost & Found network</p>
+                        <p className="text-text-muted mt-2">
+                            {role === 'admin' ? 'Setup administrative privileges' : 'Join the intelligent Lost & Found network'}
+                        </p>
+                    </div>
+
+                    {/* Role Switcher */}
+                    <div className="flex p-1 bg-surface-dark border border-white/5 rounded-xl mb-6">
+                        <button
+                            type="button"
+                            onClick={() => setRole('user')}
+                            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${role === 'user' ? "bg-primary text-white shadow-lg" : "text-text-muted hover:text-text"
+                                }`}
+                        >
+                            User Register
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setRole('admin')}
+                            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${role === 'admin' ? "bg-blue-600 text-white shadow-lg" : "text-text-muted hover:text-text"
+                                }`}
+                        >
+                            Admin Register
+                        </button>
                     </div>
 
                     <form onSubmit={handleRegister} className="space-y-5">
