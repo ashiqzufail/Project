@@ -1,65 +1,61 @@
-# Collage Project
+# AI-Powered Lost & Found Network
 
-This project consists of a Flask backend and a React (Vite) frontend.
+This project is an intelligent Lost & Found system featuring a Flask backend with vector-based image matching (CLIP) and a modern React (Vite) frontend.
+
+## Features
+- **Intelligent Matching**: Uses CLIP (Contrastive Language-Image Pre-training) to match lost and found items visually.
+- **Role-Based Access**: Separate dashboards for Users and Admins.
+- **CCTV Request System**: Integrated workflow for requesting and managing CCTV footage.
+- **Real-time Notifications**: Instant matching notifications based on text and visual similarity.
 
 ## Prerequisites
-
-- Node.js and npm
-- Python 3
-- Virtualenv (optional but recommended)
+- **Python 3.9+**
+- **Node.js 18+**
+- **npm** or **yarn**
 
 ## Getting Started
 
-### Backend Setup
+### 1. Project Initialization
+```bash
+git clone <repository-url>
+cd "Collage Project-1"
+```
 
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
+### 2. Backend Setup
+```bash
+cd backend
+# Create and activate virtual environment
+python3 -m venv .venv
+source .venv/bin/activate  # Mac/Linux
+# .venv\Scripts\activate  # Windows
 
-2. Create and activate a virtual environment (if not already acting using the existing one):
-   ```bash
-   # Create venv
-   python3 -m venv venv
-   
-   # Activate venv (Mac/Linux)
-   source venv/bin/activate
-   
-   # Activate venv (Windows)
-   venv\Scripts\activate
-   ```
+# Install dependencies
+pip install -r requirements.txt
 
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-   *(Note: If `requirements.txt` is missing, ensure you have Flask and other necessary packages installed)*
+# Run the server
+python app.py
+```
+*The backend runs on `http://localhost:5001`.*
 
-4. Run the backend server:
-   ```bash
-   python app.py
-   ```
-   The backend typically runs on `http://localhost:5000`.
+### 3. Frontend Setup
+```bash
+cd frontend
+npm install
+npm run dev
+```
+*The frontend runs on `http://localhost:5173`.*
 
-### Frontend Setup
+## Verification
+You can run the automated test suite to verify the installation:
+```bash
+cd backend
+# With venv activated
+python test_auth.py
+python test_lost.py
+python test_match.py
+```
 
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Run the development server:
-   ```bash
-   npm run dev
-   ```
-   The frontend will run on the URL shown in the terminal (usually `http://localhost:5173`).
-
-## Project Structure
-
-- `backend/`: Flask application files (API, database models, etc.)
-- `frontend/`: React application files
+## Tech Stack
+- **Frontend**: React, Vite, Framer Motion, Tailwind CSS, Lucide React.
+- **Backend**: Flask, SQLAlchemy (SQLite), Flask-JWT-Extended.
+- **AI/ML**: ChromaDB, Sentence-Transformers (CLIP), Pillow, NumPy.

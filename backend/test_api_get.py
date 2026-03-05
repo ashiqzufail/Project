@@ -2,7 +2,7 @@ import requests
 import json
 
 def test_get_lost_items():
-    url = "http://127.0.0.1:5000/api/items/lost"
+    url = "http://127.0.0.1:5001/api/items/lost"
     try:
         response = requests.get(url)
         print(f"Status Code: {response.status_code}")

@@ -8,3 +8,4 @@ chromadb
 sentence-transformers
 Pillow
 numpy
+requests

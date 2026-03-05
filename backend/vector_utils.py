@@ -30,8 +30,9 @@ def get_client():
     with _lock:
         if _client is None:
             print("Initializing ChromaDB client...")
-            # Persistent storage in ./chroma_db
-            persist_path = os.path.join(os.getcwd(), 'chroma_db')
+            # Persistent storage in ./chroma_db relative to this file
+            backend_dir = os.path.dirname(os.path.abspath(__file__))
+            persist_path = os.path.join(backend_dir, 'chroma_db')
             _client = chromadb.PersistentClient(path=persist_path)
             print("ChromaDB client initialized.")
     return _client

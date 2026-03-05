@@ -2,7 +2,7 @@ import requests
 import json
 
 def test_create_lost_item():
-    url = "http://127.0.0.1:5000/api/items/lost"
+    url = "http://127.0.0.1:5001/api/items/lost"
     data = {
         "category": "Electronics",
         "name": "Test iPhone",

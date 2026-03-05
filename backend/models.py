@@ -58,7 +58,7 @@ class LostItem(db.Model):
             "images": self.images,
             "user_id": self.user_id,
             "status": self.status,
-            "created_at": self.created_at
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }
 
 class FoundItem(db.Model):
@@ -91,7 +91,7 @@ class FoundItem(db.Model):
             "consent": self.consent,
             "images": self.images,
             "status": self.status,
-            "created_at": self.created_at
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }
 
 class CCTVRequest(db.Model):
@@ -126,7 +126,7 @@ class CCTVRequest(db.Model):
             "footages": [f.to_dict() for f in self.footages],
             "user_id": self.user_id,
             "requester": self.user.username if self.user else "Unknown",
-            "created_at": self.created_at
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }
 
 class CCTVFootage(db.Model):
@@ -140,5 +140,5 @@ class CCTVFootage(db.Model):
             "id": self.id,
             "request_id": self.request_id,
             "file_path": self.file_path,
-            "uploaded_at": self.uploaded_at
+            "uploaded_at": self.uploaded_at.isoformat() if self.uploaded_at else None
         }

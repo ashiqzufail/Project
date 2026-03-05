@@ -69,7 +69,7 @@ The system uses a hybrid matching approach:
     ```bash
     python app.py
     ```
-    *Server runs on http://127.0.0.1:5000*
+    *Server runs on http://127.0.0.1:5001*
 
 ### Frontend Setup
 1.  Navigate to `frontend`:

@@ -50,7 +50,7 @@ def report_lost():
             first_image = images_list[0]
             embedding = vector_utils.get_embedding(first_image)
             
-            if embedding:
+            if embedding is not None:
                 vector_utils.add_to_collection(
                     collection_name="lost_items",
                     item_id=new_item.id,
@@ -110,7 +110,7 @@ def report_found():
             print(f"Vectorizing found item {new_item.id}...")
             first_image = images_list[0]
             embedding = vector_utils.get_embedding(first_image)
-            if embedding:
+            if embedding is not None:
                 vector_utils.add_to_collection(
                     collection_name="found_items",
                     item_id=new_item.id,
@@ -215,7 +215,7 @@ def get_notifications():
                 existing = lost_coll.get(ids=[str(lost.id)], include=['embeddings'])
                 
                 query_embedding = None
-                if existing['embeddings'] and len(existing['embeddings']) > 0:
+                if existing.get('embeddings') is not None and len(existing['embeddings']) > 0:
                     query_embedding = existing['embeddings'][0]
                 else:
                     query_embedding = vector_utils.get_embedding(lost_images[0])
@@ -227,7 +227,7 @@ def get_notifications():
                         collection_name="found_items",
                         query_embedding=query_embedding,
                         n_results=5,
-                        threshold=0.5, # Increased threshold for precision
+                        threshold=0.5, # Restored for precision
                         where={"category": lost.category}
                     )
                     
